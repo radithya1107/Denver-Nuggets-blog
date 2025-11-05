@@ -64,4 +64,5 @@ async function initStats() {
     document.querySelector("#team-stats").innerHTML = "<p>Failed to load stats.</p>";
   }
 }
+
 document.addEventListener("DOMContentLoaded", initStats);
