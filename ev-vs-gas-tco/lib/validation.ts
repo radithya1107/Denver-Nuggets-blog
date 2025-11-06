@@ -4,16 +4,18 @@ export const schema = z.object({
   annualMileage: z.number().min(0).max(100_000),
   evPrice: z.number().min(0),
   gasPrice: z.number().min(0),
-  evIncentive: z.number().min(0).refine((val, ctx) => {
-    const root: any = ctx.parent;
-    return typeof root?.evPrice === "number" ? val <= root.evPrice : true;
-  }, "Incentive cannot exceed EV price"),
+  evIncentive: z.number().min(0),
   cEV: z.number().min(0).max(100),
   cGas: z.number().min(0).max(100),
   maintDeltaPerYear: z.number(), // can be negative
   resalePctEV: z.number().min(0).max(100),
   resalePctGas: z.number().min(0).max(100),
   years: z.number().min(1).max(20),
+}).refine((data) => {
+  return data.evIncentive <= data.evPrice;
+}, {
+  message: "Incentive cannot exceed EV price",
+  path: ["evIncentive"],
 });
 
 export const defaults = {
