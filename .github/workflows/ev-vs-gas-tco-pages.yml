@@ -32,6 +32,8 @@ jobs:
 
       - name: Build static site
         working-directory: ev-vs-gas-tco
+        env:
+          GITHUB_PAGES: 'true'
         run: npm run build
 
       - name: Add .nojekyll
