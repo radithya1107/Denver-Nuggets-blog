@@ -104,18 +104,21 @@ export default function Page() {
     ));
 
   return (
-    <main className="container mx-auto max-w-3xl p-6 md:p-10">
-      <header className="mb-6">
+    <main className="container mx-auto max-w-6xl p-6 md:p-10">
+      <header className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight">EV vs Gas — Total Cost of Ownership</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Compare 5-year ownership costs and cost per km. Keep inputs simple; adjust advanced assumptions if needed.
+        <p className="mt-2 text-sm text-slate-600">
+          Model key variables to compare ownership outcomes over your selected period.
         </p>
       </header>
 
-      <div className="grid gap-6">
-        <SectionCard>
-          <h2 className="text-lg font-semibold">Inputs</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-[360px_1fr]">
+        <div className="card-soft p-6">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">⚙️</span>
+            <h2 className="text-lg font-semibold">Core Inputs</h2>
+          </div>
+          <div className="mt-4 grid gap-4">
             <NumberInput
               label="Annual mileage"
               value={form.annualMileage}
@@ -180,7 +183,7 @@ export default function Page() {
           </div>
 
           {showAdvanced && (
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <div className="mt-4 grid gap-4">
               <NumberInput
                 label="EV resale at 5 years"
                 value={form.resalePctEV}
@@ -215,61 +218,56 @@ export default function Page() {
               ))}
             </ul>
           )}
-        </SectionCard>
+        </div>
 
-        <SectionCard>
-          <h2 className="text-lg font-semibold">Results</h2>
-          {results ? (
-            <>
-              <div className="mt-4 grid gap-4 md:grid-cols-3">
-                <Stat label="5-Year TCO (EV)" value={formatCurrency(results.tcoEV)} subtext="After incentive & resale" />
-                <Stat label="5-Year TCO (Gas)" value={formatCurrency(results.tcoGas)} subtext="After resale" />
-                <Stat label="Difference (EV − Gas)" value={formatCurrency(results.diffTCO)} subtext={results.kmTotal.toLocaleString() + " km total"} />
-              </div>
-
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-gray-700">{diffBadge}</div>
-                <div className="text-sm text-gray-600">
-                  Cost/km — EV: <span className="font-medium">{formatCurrency(results.cpkEV)}</span> · Gas:{" "}
-                  <span className="font-medium">{formatCurrency(results.cpkGas)}</span>
+        <div className="grid gap-6">
+          <div className="card-soft p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Summary</h2>
+              <div className="text-sm text-slate-700">{diffBadge}</div>
+            </div>
+            {results ? (
+              <>
+                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                  <Stat label="5-Year TCO (EV)" value={formatCurrency(results.tcoEV)} subtext="After incentive & resale" />
+                  <Stat label="5-Year TCO (Gas)" value={formatCurrency(results.tcoGas)} subtext="After resale" />
+                  <Stat label="Difference (EV − Gas)" value={formatCurrency(results.diffTCO)} subtext={results.kmTotal.toLocaleString() + " km total"} />
                 </div>
-              </div>
+                <div className="mt-4 text-sm text-slate-600">
+                  Cost/km — EV: <span className="font-medium">{formatCurrency(results.cpkEV)}</span> · Gas: <span className="font-medium">{formatCurrency(results.cpkGas)}</span>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-slate-600">Fix the input errors to see results.</p>
+            )}
+          </div>
 
+          {results && (
+            <div className="card-soft p-6">
+              <h3 className="text-sm font-semibold text-slate-800">Cost Difference Over Time</h3>
+              <BarChart years={form.years} ev={results.tcoEV} gas={results.tcoGas} />
               <details className="mt-4">
-                <summary className="cursor-pointer text-sm font-medium text-gray-800">Show cost breakdown</summary>
+                <summary className="cursor-pointer text-sm font-medium text-slate-800">Show cost breakdown</summary>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   <BreakdownCard
                     title="EV"
-                    items={[
-                      ["Upfront (after incentive)", results.upfrontEV],
-                      ["Energy (total)", results.energyEV],
-                      ["Maint. delta (total)", results.maintDelta],
-                      ["Resale (5y)", -results.resaleEV],
-                    ]}
+                    items={[["Upfront (after incentive)", results.upfrontEV],["Energy (total)", results.energyEV],["Maint. delta (total)", results.maintDelta],["Resale (5y)", -results.resaleEV]]}
                     total={results.tcoEV}
                   />
                   <BreakdownCard
                     title="Gas"
-                    items={[
-                      ["Upfront", results.upfrontGas],
-                      ["Energy (total)", results.energyGas],
-                      ["Maint. baseline", 0],
-                      ["Resale (5y)", -results.resaleGas],
-                    ]}
+                    items={[["Upfront", results.upfrontGas],["Energy (total)", results.energyGas],["Maint. baseline", 0],["Resale (5y)", -results.resaleGas]]}
                     total={results.tcoGas}
                   />
                 </div>
               </details>
-            </>
-          ) : (
-            <p className="mt-2 text-sm text-gray-600">Fix the input errors above to see results.</p>
+            </div>
           )}
-        </SectionCard>
 
-        <p className="text-xs text-gray-500">
-          Notes: "Maintenance delta" is EV annual maintenance minus Gas annual maintenance (can be negative). Energy cost per km
-          already incorporates unit price × consumption. Percent resales are applied to purchase prices.
-        </p>
+          <p className="text-xs text-slate-500">
+            Notes: Maintenance delta is EV annual maintenance minus Gas annual maintenance (can be negative). Energy cost per km already incorporates unit price × consumption.
+          </p>
+        </div>
       </div>
     </main>
   );
@@ -298,6 +296,36 @@ function BreakdownCard({
       <div className="mt-3 border-t pt-3 text-sm">
         <span className="text-gray-600">Total</span>
         <span className="float-right font-semibold">{formatCurrency(total)}</span>
+      </div>
+    </div>
+  );
+}
+
+function BarChart({ years, ev, gas }: { years: number; ev: number; gas: number }) {
+  const max = Math.max(ev, gas) || 1;
+  const bars = Array.from({ length: years }, (_, i) => i + 1);
+  return (
+    <div className="mt-4">
+      <div className="h-52 w-full rounded-lg border border-slate-200 p-3">
+        <div className="flex h-full items-end gap-2">
+          {bars.map((y) => {
+            const evH = (ev / max) * 100;
+            const gasH = (gas / max) * 100;
+            return (
+              <div key={y} className="flex w-full max-w-[18px] flex-col items-center gap-1">
+                <div className="flex w-full items-end gap-1">
+                  <div className="h-full w-1/2 rounded-sm bg-emerald-500" style={{ height: `${evH}%` }} />
+                  <div className="h-full w-1/2 rounded-sm bg-indigo-500" style={{ height: `${gasH}%` }} />
+                </div>
+                <span className="text-[10px] text-slate-500">{y}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center gap-4 text-xs text-slate-600">
+        <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-emerald-500" /> EV</span>
+        <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-indigo-500" /> Gas</span>
       </div>
     </div>
   );
