@@ -4,9 +4,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // If your repo name is not the root, set basePath
-  // basePath: '/ev-vs-gas-tco',
-  // trailingSlash: true,
+  // Project Pages are served from https://<user>.github.io/<repo>
+  // This repo is "Coding-practice"; set basePath accordingly for asset routing.
+  basePath: '/Coding-practice',
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
