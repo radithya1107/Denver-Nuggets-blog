@@ -1,7 +1,7 @@
 title: "Denver Nuggets Blog"
 description: "A simple multi-page Jekyll site about the Denver Nuggets."
 url: "https://radithya1107.github.io"
-baseurl: "/Coding-practice"  # IMPORTANT for project sites
+baseurl: "/Denver-Nuggets-Blog"  # IMPORTANT for project sites
 
 theme: minima
 
